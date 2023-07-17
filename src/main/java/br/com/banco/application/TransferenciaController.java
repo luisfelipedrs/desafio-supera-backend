@@ -22,13 +22,23 @@ public class TransferenciaController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getTransferencias(@RequestParam @JsonFormat(pattern = "dd/MM/yyyy")Optional<LocalDate> inicio,
-                                               @RequestParam @JsonFormat(pattern = "dd/MM/yyyy")Optional<LocalDate> termino) {
+    public ResponseEntity<?> getTransferencias(@RequestParam @JsonFormat(pattern = "dd/MM/yyyy") Optional<LocalDate> inicio,
+                                               @RequestParam @JsonFormat(pattern = "dd/MM/yyyy") Optional<LocalDate> termino,
+                                               @RequestParam Optional<String> nome) {
 
-        if (inicio.isPresent() && termino.isPresent()) {
-            return ResponseEntity.ok(service.getTransferenciasEntrePeriodo(inicio.get(), termino.get()));
+        if (inicio.isPresent() && termino.isPresent() && nome.isPresent()) {
+            return ResponseEntity
+                    .ok(service.getTransferenciasByOperadorEData(nome.get(),
+                            inicio.get(),
+                            termino.get()));
         }
 
-        return ResponseEntity.ok(service.getTransferencias());
+        if (inicio.isPresent() && termino.isPresent()) {
+            return ResponseEntity
+                    .ok(service.getTransferenciasEntrePeriodo(inicio.get(), termino.get()));
+        }
+
+        return ResponseEntity
+                .ok(service.getTransferencias());
     }
 }

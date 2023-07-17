@@ -1,6 +1,7 @@
 package br.com.banco.services;
 
 import br.com.banco.application.dtos.TransferenciaResponse;
+import br.com.banco.domain.models.Transferencia;
 import br.com.banco.domain.repositories.TransferenciaRepository;
 import org.springframework.stereotype.Service;
 
@@ -33,10 +34,24 @@ public class TransferenciaService {
                 .collect(Collectors.toList());
     }
 
-    public List<TransferenciaResponse> getTransferenciaByOperador(String nome) {
+    public List<TransferenciaResponse> getTransferenciasByOperador(String nome) {
         return repository
-                .findByNomeOperadorTransferencia(nome)
+                .findBynomeOperadorTransacao(nome)
                 .stream()
+                .map(TransferenciaResponse::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<TransferenciaResponse> getTransferenciasByOperadorEData(String nomeOperador,
+                                                                        LocalDate inicio,
+                                                                        LocalDate termino) {
+
+        return repository
+                .findByDataTransferenciaBetween(inicio, termino)
+                .stream()
+                .filter(transferencia -> transferencia
+                        .getNomeOperadorTransacao()
+                        .equals(nomeOperador))
                 .map(TransferenciaResponse::new)
                 .collect(Collectors.toList());
     }

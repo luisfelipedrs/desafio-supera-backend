@@ -22,15 +22,20 @@ public class Transferencia {
     @Column(nullable = false)
     private BigDecimal valor;
 
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private TipoTransacao tipo;
+
     @Column
     private String nomeOperadorTransacao;
 
     @Column(nullable = false)
     private Long contaId;
 
-    public Transferencia(LocalDate dataTransferencia, BigDecimal valor, String nomeOperadorTransacao, Long contaId) {
+    public Transferencia(LocalDate dataTransferencia, BigDecimal valor, TipoTransacao tipo, String nomeOperadorTransacao, Long contaId) {
         this.dataTransferencia = dataTransferencia;
         this.valor = valor;
+        this.tipo = tipo;
         this.nomeOperadorTransacao = nomeOperadorTransacao;
         this.contaId = contaId;
     }
