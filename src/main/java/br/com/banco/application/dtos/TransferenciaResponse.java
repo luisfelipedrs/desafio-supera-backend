@@ -3,11 +3,15 @@ package br.com.banco.application.dtos;
 import br.com.banco.domain.models.TipoTransacao;
 import br.com.banco.domain.models.Transferencia;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@NoArgsConstructor
+@AllArgsConstructor
 @Getter
 public class TransferenciaResponse {
 
