@@ -1,5 +1,7 @@
 package br.com.banco.application;
 
+import br.com.banco.application.dtos.TransferenciaResponse;
+import br.com.banco.services.TipoPesquisaService;
 import br.com.banco.services.TransferenciaService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -12,41 +14,33 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v1/transferencias")
 public class TransferenciaController {
 
-    private final TransferenciaService service;
+    private final TipoPesquisaService service;
 
-    public TransferenciaController(TransferenciaService service) {
+    public TransferenciaController(TipoPesquisaService service) {
         this.service = service;
     }
 
     @Transactional
     @GetMapping
-    public ResponseEntity<?> getTransferencias(@RequestParam(required = false) LocalDate inicio,
-                                               @RequestParam(required = false) LocalDate termino,
-                                               @RequestParam(required = false) String nome,
-                                               @PageableDefault(size = 4, page = 0, sort = "id", direction = Sort.Direction.ASC)
-                                                   Pageable pageable) {
+    public ResponseEntity<List<TransferenciaResponse>> getTransferencias(@RequestParam(required = false) LocalDate inicio,
+                                                                         @RequestParam(required = false) LocalDate termino,
+                                                                         @RequestParam(required = false) String nome,
+                                                                         @PageableDefault(size = 4,
+                                                                                 page = 0,
+                                                                                 sort = "id",
+                                                                                 direction = Sort.Direction.ASC)
+                                                                             Pageable pageable) {
 
-        if (inicio != null && termino != null && nome != null) {
-            return ResponseEntity
-                    .ok(service.getTransferenciasByOperadorEData(pageable, nome, inicio, termino));
-        }
-
-        if (nome != null) {
-            return ResponseEntity
-                    .ok(service.getTransferenciasByOperador(pageable, nome));
-        }
-
-        if (inicio != null && termino != null) {
-            return ResponseEntity
-                    .ok(service.getTransferenciasEntrePeriodo(pageable, inicio, termino.plusDays(1)));
-        }
-
-        return ResponseEntity
-                .ok(service.getTransferencias(pageable));
+        return ResponseEntity.ok(service.getTransferencias(inicio, termino, nome, pageable)
+                        .stream()
+                        .map(TransferenciaResponse::new)
+                        .collect(Collectors.toList()));
     }
 }

@@ -12,7 +12,6 @@ import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.internal.hamcrest.HamcrestArgumentMatcher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,7 +28,6 @@ import java.time.LocalDate;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 
 @SpringBootTest
@@ -59,7 +57,7 @@ class TransferenciaControllerTest {
     }
 
     @Test
-    @DisplayName("deve listar transferencias")
+    @DisplayName("deve listar transferências")
     void test1() throws Exception {
 
         Transferencia transferencia1 = new Transferencia(LocalDate.now(),
@@ -110,7 +108,7 @@ class TransferenciaControllerTest {
     }
 
     @Test
-    @DisplayName("deve listar transferencias realizadas por uma pessoa")
+    @DisplayName("deve listar transferências realizadas por uma pessoa")
     void test2() throws Exception {
 
         Transferencia transferencia1 = new Transferencia(LocalDate.now(),
@@ -167,7 +165,7 @@ class TransferenciaControllerTest {
     }
 
     @Test
-    @DisplayName("deve listar transferencias realizadas entre um período")
+    @DisplayName("deve listar transferências realizadas entre um período")
     void test3() throws Exception {
 
         Transferencia transferencia1 = new Transferencia(LocalDate.of(2015, 5, 22),
@@ -230,7 +228,7 @@ class TransferenciaControllerTest {
     }
 
     @Test
-    @DisplayName("deve listar transferencias realizadas entre um período e por determinada pessoa")
+    @DisplayName("deve listar transferências realizadas entre um período e por determinada pessoa")
     void test4() throws Exception {
 
         Transferencia transferencia1 = new Transferencia(LocalDate.of(2015, 5, 22),
@@ -284,5 +282,102 @@ class TransferenciaControllerTest {
                                 transferencia2.getTipo(),
                                 transferencia2.getNomeOperadorTransacao(),
                                 transferencia2.getContaId()));
+    }
+
+    @Test
+    @DisplayName("lista deve retornar vazia caso não existam transferências no nome da pessoa solicitada")
+    void test5() throws Exception {
+
+        Transferencia transferencia1 = new Transferencia(LocalDate.of(2015, 5, 22),
+                new BigDecimal(25),
+                TipoTransacao.SAQUE,
+                "Luis",
+                conta.getIdConta());
+
+        Transferencia transferencia2 = new Transferencia(LocalDate.of(2015, 8, 30),
+                new BigDecimal(1000),
+                TipoTransacao.SAQUE,
+                "Luis",
+                conta.getIdConta());
+
+        Transferencia transferencia3 = new Transferencia(LocalDate.of(2023, 2, 20),
+                new BigDecimal(500),
+                TipoTransacao.SAQUE,
+                "Joaquim",
+                conta.getIdConta());
+
+        Transferencia transferencia4 = new Transferencia(LocalDate.of(2023, 5, 13),
+                new BigDecimal(500),
+                TipoTransacao.SAQUE,
+                "Joaquim",
+                conta.getIdConta());
+
+        transferenciaRepository.saveAll(List.of(transferencia1, transferencia2, transferencia3, transferencia4));
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get("/v1/transferencias?inicio=30/08/2015&termino=20/02/2023&nome=Jorge")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Accept-Language", "pt-br");
+
+        String payload = mockMvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
+
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
+
+        List<TransferenciaResponse> response = objectMapper
+                .readValue(payload, typeFactory.constructCollectionType(List.class, TransferenciaResponse.class));
+
+        assertThat(response).hasSize(0);
+    }
+
+    @Test
+    @DisplayName("lista deve retornar vazia caso não existam transferências realizadas no período solicitado")
+    void test6() throws Exception {
+        Transferencia transferencia1 = new Transferencia(LocalDate.of(2015, 5, 22),
+                new BigDecimal(25),
+                TipoTransacao.SAQUE,
+                "Luis",
+                conta.getIdConta());
+
+        Transferencia transferencia2 = new Transferencia(LocalDate.of(2015, 8, 30),
+                new BigDecimal(1000),
+                TipoTransacao.SAQUE,
+                "Luis",
+                conta.getIdConta());
+
+        Transferencia transferencia3 = new Transferencia(LocalDate.of(2023, 2, 20),
+                new BigDecimal(500),
+                TipoTransacao.SAQUE,
+                "Joaquim",
+                conta.getIdConta());
+
+        Transferencia transferencia4 = new Transferencia(LocalDate.of(2023, 5, 13),
+                new BigDecimal(500),
+                TipoTransacao.SAQUE,
+                "Joaquim",
+                conta.getIdConta());
+
+        transferenciaRepository.saveAll(List.of(transferencia1, transferencia2, transferencia3, transferencia4));
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get("/v1/transferencias?inicio=30/03/2023&termino=20/04/2023")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Accept-Language", "pt-br");
+
+        String payload = mockMvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andReturn()
+                .getResponse()
+                .getContentAsString(StandardCharsets.UTF_8);
+
+        TypeFactory typeFactory = objectMapper.getTypeFactory();
+
+        List<TransferenciaResponse> response = objectMapper
+                .readValue(payload, typeFactory.constructCollectionType(List.class, TransferenciaResponse.class));
+
+        assertThat(response).hasSize(0);
     }
 }
