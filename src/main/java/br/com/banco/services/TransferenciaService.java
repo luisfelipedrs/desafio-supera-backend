@@ -2,6 +2,7 @@ package br.com.banco.services;
 
 import br.com.banco.application.dtos.TransferenciaResponse;
 import br.com.banco.domain.repositories.TransferenciaRepository;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -17,35 +18,36 @@ public class TransferenciaService {
         this.transferenciaRepository = transferenciaRepository;
     }
 
-    public List<TransferenciaResponse> getTransferencias() {
+    public List<TransferenciaResponse> getTransferencias(Pageable pageable) {
         return transferenciaRepository
-                .findAll()
+                .findAll(pageable)
                 .stream()
                 .map(TransferenciaResponse::new)
                 .collect(Collectors.toList());
     }
 
-    public List<TransferenciaResponse> getTransferenciasEntrePeriodo(LocalDate inicio, LocalDate termino) {
+    public List<TransferenciaResponse> getTransferenciasEntrePeriodo(Pageable pageable, LocalDate inicio, LocalDate termino) {
         return transferenciaRepository
-                .findByDataTransferenciaBetween(inicio, termino)
+                .findByDataTransferenciaBetween(pageable, inicio, termino)
                 .stream()
                 .map(TransferenciaResponse::new)
                 .collect(Collectors.toList());
     }
 
-    public List<TransferenciaResponse> getTransferenciasByOperador(String nome) {
+    public List<TransferenciaResponse> getTransferenciasByOperador(Pageable pageable, String nome) {
         return transferenciaRepository
-                .findByNomeOperadorTransacaoContaining(nome)
+                .findByNomeOperadorTransacaoContaining(pageable, nome)
                 .stream()
                 .map(TransferenciaResponse::new)
                 .collect(Collectors.toList());
     }
 
-    public List<TransferenciaResponse> getTransferenciasByOperadorEData(String nomeOperador,
+    public List<TransferenciaResponse> getTransferenciasByOperadorEData(Pageable pageable,
+                                                                        String nomeOperador,
                                                                         LocalDate inicio,
                                                                         LocalDate termino) {
         return transferenciaRepository
-                .findByDataTransferenciaBetween(inicio, termino)
+                .findByDataTransferenciaBetween(pageable, inicio, termino)
                 .stream()
                 .map(TransferenciaResponse::new)
                 .filter(transferencia -> transferencia.getNomeOperadorTransacao() != null)
