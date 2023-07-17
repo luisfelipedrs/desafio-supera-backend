@@ -1,7 +1,6 @@
 package br.com.banco.services;
 
 import br.com.banco.application.dtos.TransferenciaResponse;
-import br.com.banco.domain.models.Transferencia;
 import br.com.banco.domain.repositories.TransferenciaRepository;
 import org.springframework.stereotype.Service;
 
@@ -12,14 +11,14 @@ import java.util.stream.Collectors;
 @Service
 public class TransferenciaService {
 
-    private final TransferenciaRepository repository;
+    private final TransferenciaRepository transferenciaRepository;
 
-    public TransferenciaService(TransferenciaRepository repository) {
-        this.repository = repository;
+    public TransferenciaService(TransferenciaRepository transferenciaRepository) {
+        this.transferenciaRepository = transferenciaRepository;
     }
 
     public List<TransferenciaResponse> getTransferencias() {
-        return repository
+        return transferenciaRepository
                 .findAll()
                 .stream()
                 .map(TransferenciaResponse::new)
@@ -27,7 +26,7 @@ public class TransferenciaService {
     }
 
     public List<TransferenciaResponse> getTransferenciasEntrePeriodo(LocalDate inicio, LocalDate termino) {
-        return repository
+        return transferenciaRepository
                 .findByDataTransferenciaBetween(inicio, termino)
                 .stream()
                 .map(TransferenciaResponse::new)
@@ -35,8 +34,8 @@ public class TransferenciaService {
     }
 
     public List<TransferenciaResponse> getTransferenciasByOperador(String nome) {
-        return repository
-                .findBynomeOperadorTransacao(nome)
+        return transferenciaRepository
+                .findByNomeOperadorTransacaoContaining(nome)
                 .stream()
                 .map(TransferenciaResponse::new)
                 .collect(Collectors.toList());
@@ -45,14 +44,12 @@ public class TransferenciaService {
     public List<TransferenciaResponse> getTransferenciasByOperadorEData(String nomeOperador,
                                                                         LocalDate inicio,
                                                                         LocalDate termino) {
-
-        return repository
+        return transferenciaRepository
                 .findByDataTransferenciaBetween(inicio, termino)
                 .stream()
-                .filter(transferencia -> transferencia
-                        .getNomeOperadorTransacao()
-                        .equals(nomeOperador))
                 .map(TransferenciaResponse::new)
+                .filter(transferencia -> transferencia.getNomeOperadorTransacao() != null)
+                .filter(transferencia -> transferencia.getNomeOperadorTransacao().contains(nomeOperador))
                 .collect(Collectors.toList());
     }
 }
