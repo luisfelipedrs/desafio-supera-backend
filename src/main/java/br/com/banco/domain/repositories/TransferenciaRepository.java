@@ -12,5 +12,6 @@ import java.util.List;
 public interface TransferenciaRepository extends JpaRepository<Transferencia, Long> {
 
     List<Transferencia> findByDataTransferenciaBetween(Pageable pageable, LocalDate inicio, LocalDate termino);
+    List<Transferencia> findByDataTransferenciaBetween(LocalDate inicio, LocalDate termino);
     List<Transferencia> findByNomeOperadorTransacaoContaining(Pageable pageable, String nome);
 }

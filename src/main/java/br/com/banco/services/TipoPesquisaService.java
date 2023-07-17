@@ -7,6 +7,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -19,11 +20,10 @@ public class TipoPesquisaService {
         this.service = service;
     }
 
-    public List<Transferencia> getTransferencias(
-            LocalDate inicio,
-            LocalDate termino,
-            String nome,
-            Pageable pageable) {
+    public List<Transferencia> getTransferencias(LocalDate inicio,
+                                                 LocalDate termino,
+                                                 String nome,
+                                                 Pageable pageable) {
 
         if (inicio != null && termino != null && nome != null) {
             return service.getTransferenciasByOperadorEData(pageable, nome, inicio, termino);
@@ -38,5 +38,14 @@ public class TipoPesquisaService {
         }
 
         return service.getTransferencias(pageable);
+    }
+
+    public BigDecimal getSaldo(LocalDate inicio, LocalDate termino) {
+
+        if (inicio != null && termino != null) {
+            return service.getSaldo(inicio, termino.plusDays(1));
+        }
+
+        return service.getSaldo();
     }
 }

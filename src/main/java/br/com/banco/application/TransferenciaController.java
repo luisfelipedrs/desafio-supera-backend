@@ -2,7 +2,6 @@ package br.com.banco.application;
 
 import br.com.banco.application.dtos.TransferenciaResponse;
 import br.com.banco.services.TipoPesquisaService;
-import br.com.banco.services.TransferenciaService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -42,5 +41,13 @@ public class TransferenciaController {
                         .stream()
                         .map(TransferenciaResponse::new)
                         .collect(Collectors.toList()));
+    }
+
+    @Transactional
+    @GetMapping("/saldo")
+    public ResponseEntity<?> getSaldo(@RequestParam(required = false) LocalDate inicio,
+                                               @RequestParam(required = false) LocalDate termino) {
+
+        return ResponseEntity.ok(service.getSaldo(inicio, termino));
     }
 }
