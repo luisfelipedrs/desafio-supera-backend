@@ -2,14 +2,12 @@ package br.com.banco.services;
 
 import br.com.banco.domain.models.Transferencia;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TipoPesquisaService {
@@ -27,6 +25,10 @@ public class TipoPesquisaService {
 
         if (inicio != null && termino != null && nome != null) {
             return service.getTransferenciasByOperadorEData(pageable, nome, inicio, termino);
+        }
+
+        if (Objects.equals(nome, "")) {
+            return service.getTransferencias(pageable);
         }
 
         if (nome != null) {

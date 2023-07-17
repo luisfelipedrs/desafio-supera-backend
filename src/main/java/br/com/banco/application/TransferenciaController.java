@@ -2,8 +2,7 @@ package br.com.banco.application;
 
 import br.com.banco.application.dtos.TransferenciaResponse;
 import br.com.banco.services.TipoPesquisaService;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,19 +27,21 @@ public class TransferenciaController {
 
     @Transactional
     @GetMapping
-    public ResponseEntity<List<TransferenciaResponse>> getTransferencias(@RequestParam(required = false) LocalDate inicio,
+    public ResponseEntity<Page<TransferenciaResponse>> getTransferencias(@RequestParam(required = false) LocalDate inicio,
                                                                          @RequestParam(required = false) LocalDate termino,
-                                                                         @RequestParam(required = false) String nome,
+                                                                         @RequestParam(required = false, defaultValue = "") String nome,
                                                                          @PageableDefault(size = 4,
                                                                                  page = 0,
                                                                                  sort = "id",
                                                                                  direction = Sort.Direction.ASC)
                                                                              Pageable pageable) {
 
-        return ResponseEntity.ok(service.getTransferencias(inicio, termino, nome, pageable)
-                        .stream()
-                        .map(TransferenciaResponse::new)
-                        .collect(Collectors.toList()));
+        List<TransferenciaResponse> transferencias = service.getTransferencias(inicio, termino, nome, pageable)
+                .stream()
+                .map(TransferenciaResponse::new)
+                .collect(Collectors.toList());
+
+        return ResponseEntity.ok(new PageImpl<>(transferencias, pageable, transferencias.size()));
     }
 
     @Transactional

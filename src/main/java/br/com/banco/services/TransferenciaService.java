@@ -1,6 +1,5 @@
 package br.com.banco.services;
 
-import br.com.banco.application.dtos.TransferenciaResponse;
 import br.com.banco.domain.models.Transferencia;
 import br.com.banco.domain.repositories.TransferenciaRepository;
 import org.springframework.data.domain.Pageable;
@@ -29,12 +28,16 @@ public class TransferenciaService {
 
     public List<Transferencia> getTransferenciasEntrePeriodo(Pageable pageable, LocalDate inicio, LocalDate termino) {
         return transferenciaRepository
-                .findByDataTransferenciaBetween(pageable, inicio, termino);
+                .findByDataTransferenciaBetween(pageable, inicio, termino)
+                .stream()
+                .collect(Collectors.toList());
     }
 
     public List<Transferencia> getTransferenciasByOperador(Pageable pageable, String nome) {
         return transferenciaRepository
-                .findByNomeOperadorTransacaoContaining(pageable, nome);
+                .findByNomeOperadorTransacaoContaining(pageable, nome)
+                .stream()
+                .collect(Collectors.toList());
     }
 
     public List<Transferencia> getTransferenciasByOperadorEData(Pageable pageable,
