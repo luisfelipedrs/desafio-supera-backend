@@ -1,12 +1,12 @@
 package br.com.banco.services;
 
 import br.com.banco.domain.models.Transferencia;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -18,20 +18,16 @@ public class TipoPesquisaService {
         this.service = service;
     }
 
-    public List<Transferencia> getTransferencias(LocalDate inicio,
+    public Page<Transferencia> getTransferencias(LocalDate inicio,
                                                  LocalDate termino,
                                                  String nome,
                                                  Pageable pageable) {
 
-        if (inicio != null && termino != null && nome != null) {
+        if (inicio != null && termino != null && nome != null && !nome.equals("")) {
             return service.getTransferenciasByOperadorEData(pageable, nome, inicio, termino);
         }
 
-        if (Objects.equals(nome, "")) {
-            return service.getTransferencias(pageable);
-        }
-
-        if (nome != null) {
+        if (nome != null && !nome.equals("")) {
             return service.getTransferenciasByOperador(pageable, nome);
         }
 
